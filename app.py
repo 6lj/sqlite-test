@@ -2,9 +2,18 @@ from http.server import HTTPServer, SimpleHTTPRequestHandler
 import sqlite3
 import json
 import urllib.parse
-from pathlib import Path
+import sys
 
-class AuthHandler(SimpleHTTPRequestHandler):
+class CORSRequestHandler(SimpleHTTPRequestHandler):
+
+    def do_OPTIONS(self):
+        # Handle CORS preflight requests
+        self.send_response(200)
+        self.send_header("Access-Control-Allow-Origin", "*")
+        self.send_header("Access-Control-Allow-Methods", "POST, GET, OPTIONS")
+        self.send_header("Access-Control-Allow-Headers", "Content-Type")
+        self.end_headers()
+
     def do_POST(self):
         content_length = int(self.headers['Content-Length'])
         post_data = self.rfile.read(content_length).decode('utf-8')
@@ -18,14 +27,10 @@ class AuthHandler(SimpleHTTPRequestHandler):
             response = {'error': 'Invalid endpoint'}
 
         self.send_response(200)
+        self.send_header('Access-Control-Allow-Origin', '*')  # Allow CORS
         self.send_header('Content-type', 'application/json')
         self.end_headers()
         self.wfile.write(json.dumps(response).encode())
-
-    def do_GET(self):
-        if self.path == '/':
-            self.path = '/login.html'
-        return SimpleHTTPRequestHandler.do_GET(self)
 
     def handle_register(self, data):
         try:
@@ -77,6 +82,15 @@ def init_db():
 
 if __name__ == '__main__':
     init_db()
-    server = HTTPServer(('0.0.0.0', 5500), AuthHandler)
-    print('Server running on http://127.0.0.1:5500/')
+
+    # If no port is specified, default to 5500
+    port = 5500
+    if len(sys.argv) > 1:
+        try:
+            port = int(sys.argv[1])  # Accept port from command-line argument
+        except ValueError:
+            print("Invalid port number. Falling back to default port 5500.")
+    
+    server = HTTPServer(('0.0.0.0', port), CORSRequestHandler)  # Listen on all network interfaces
+    print(f'Server running on http://0.0.0.0:{port}/')
     server.serve_forever()
