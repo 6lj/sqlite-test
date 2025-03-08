@@ -59,8 +59,5 @@ def login():
 if __name__ == '__main__':
     init_db()
     
-    # Use environment variables for deployment configurations
-    host = os.getenv('FLASK_HOST', '0.0.0.0')
-    port = int(os.getenv('FLASK_PORT', 5000))
-    
-    app.run(host=host, port=port)
+  
+    app.run()
