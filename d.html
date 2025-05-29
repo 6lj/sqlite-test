@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>عرض بيانات LocalStorage</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <script src="https://6lj.github.io/sqlite-test/localStorageHandler.js"></script>
+  <script src="https://6lj.github.io/sqlite-test/fileProcessor.js"></script>
+</head>
+<body>
+  <div class="storage-container">
+    <h1>بيانات LocalStorage</h1>
+    <div id="storageList"></div>
+    <div id="message"></div>
+    <button onclick="window.LocalStorageModule.sendDataToServer()">إرسال البيانات إلى الخادم</button>
+  </div>
+
+  <script>
+    
+    if (window.location.hostname === "localhost" && localStorage.length === 0) {
+      localStorage.setItem("sampleKey1", "مثال على البيانات");
+      localStorage.setItem("sampleKey2", "12345");
+    }
+
+    
+    window.onload = function() {
+      window.LocalStorageModule.displayLocalStorage();
+    };
+  </script>
+</body>
+</html>
